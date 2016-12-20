@@ -4,12 +4,20 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+![alt text][me]
 
-You can find the source code for the Jekyll new theme at:
-{% include icon-github.html username="jekyll" %} /
-[minima](https://github.com/jekyll/minima)
+I am Panayiotis Panayiotou, a CS student at [Imperial College London](https://www.imperial.ac.uk/)
 
-You can find the source code for Jekyll at
-{% include icon-github.html username="jekyll" %} /
-[jekyll](https://github.com/jekyll/jekyll)
+I like spending my time on learning computing(or science) related stuff and solving problems.
+
+I created this website as a place for sharing thoughts and knowledge.
+
+If you would like to know more about me, check me on
+
+[LinkedIn](https://uk.linkedin.com/pub/panayiotis-panayiotou/108/437/905)
+and
+[Github](https://github.com/panpan2)
+
+Also feel free to email me if you have anything exciting in mind!
+
+[me]: https://avatars2.githubusercontent.com/u/15856040?v=3&s=460
