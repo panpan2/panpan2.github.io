@@ -33,8 +33,7 @@ bundle lock --update
 '''
 # Render LaTeX $$E=mc^2$$
 bundle exec jekyll serve
-// Enlarge margin
-// add latex support
-// add a new post
-// write posts :)
+# Add a new post
+touch _posts/2021-04-19-Another-one.md
+# Write more posts :)
 ```
