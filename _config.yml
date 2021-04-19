@@ -1,18 +1,18 @@
-site: Asko
-url: #yoururl
-title: Asko
-description: Simple and minimalistic jekyll blogging theme.
+site: PaniBlog
+url: http://panpan2.github.io/
+title: PaniBlog
+description: # description
 googlewebfonts: Fira+Code:wght@400;500;700
 twitter:
   username: #yourusername
   card: summary
   creator: #yourusername
 author:
-  twitter: #yourusername
-  name: #yourusername
+  twitter: https://twitter.com/panayiot2
+  name: Panayiotis Pani Panayiotou
   avatar:
-  email: #youremail
-  url: #yoururl
+  email: p.panayiotou2@gmail.com
+  url: http://panpan2.github.io/
 permalink: pretty
 
 baseurl: ""
@@ -21,14 +21,14 @@ highlighter: rouge
 
 exclude:
   - .jekyll-cache
-  
+
 compress_html:
   clippings: all
   comments: ["<!-- ", " -->"]
 
 sass:
-  sass_dir:          _sass
-  style:            :compressed
+  sass_dir: _sass
+  style: :compressed
 
 plugins:
   - jekyll-paginate
@@ -42,21 +42,18 @@ collections:
   posts:
     output: true
     permalink: /:year/:month/:day/:slug
-  
+
 defaults:
-  -
-    scope:
+  - scope:
       path: ""
     values:
       layout: "default"
-  -
-    scope:
+  - scope:
       path: ""
       type: "pages"
     values:
       layout: "page"
-  -
-    scope:
+  - scope:
       path: ""
       type: "posts"
     values:
