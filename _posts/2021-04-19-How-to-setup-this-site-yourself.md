@@ -17,9 +17,9 @@ bundle install
 # Update kramdown to 2.3.1
 gem install kramdown
 bundle lock --update
-# Setup mathjax support
-# On the top of the post add 'usemathjax: true'
-# Add the following to '_includes/head.html'
+# Setup mathjax support:
+# 1: On the top of each post add 'usemathjax: true'
+# 2: Add the following to '_includes/head.html'
 '''
 <!-- for mathjax support -->
     {% if page.usemathjax %}
@@ -31,7 +31,8 @@ bundle lock --update
       <script type="text/javascript" async src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     {% endif %}
 '''
-# Render LaTeX $$E=mc^2$$
+# 3: Render LaTeX $$E=mc^2$$
+# To build this
 bundle exec jekyll serve
 # Add a new post
 touch _posts/2021-04-19-Another-one.md
