@@ -4,6 +4,7 @@ title: How to setup this site yourself
 summary: Setting up this blog using Jekyll
 tags: [blog]
 usemathjax: true
+comments: true
 ---
 
 This site was built using [Jekyll](https://jekyllrb.com/docs/). You might want to check the setup guide to build something more accustomed to your needs.
