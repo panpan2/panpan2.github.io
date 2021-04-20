@@ -49,7 +49,7 @@ Pros/Cons:
 - (-) String representations are not designed to capture molecular similarity, chemically similar molecules can have very different string representations
 - (-) Seq2Seq / Transformer methods on top of strings are not permutation invariant w.r.t. graph nodes
 
-{% include image.html url="molgraphlearning/smiles-example.png" description="SMILES string for a particular molecule" %}
+{% include image.html url="molgraphlearning/smiles-example.png" description="SMILES string for a particular molecule" w="25" %}
 
 ## Autoregressive approaches
 
@@ -61,7 +61,7 @@ Pros/Cons:
 - (-) Not permutation invariant w.r.t. graph nodes
 - (-) Problematic for big molecules (hard to model long-term dependencies)
 
-{% include image.html url="molgraphlearning/autoregressive.png" description="Generating a molecule atom-by-atom" %}
+{% include image.html url="molgraphlearning/autoregressive.png" description="Generating a molecule atom-by-atom" w="55" %}
 
 ## Junction Tree models
 
@@ -75,7 +75,7 @@ Pros/Cons:
 - (-) Junction tree not unique and not guaranteed to exist
 - (-) No permutation and isomorphism invariance
 
-{% include image.html url="molgraphlearning/jt.png" description="Junction tree approach. The clusters (colored circles) are selected from a fixed vocabulary and are abstracted away, to form the Junction tree. Both the molecular graph and the Junction tree are separately encoded. The Junction tree is the first to be decoded. The decoded junction tree is combined with the molecular graph hidden representation to decode the clusters sequentially, selecting only the ones that will keep the molecule valid. Image taken from $\href{#4}{[4]}$" %}
+{% include image.html url="molgraphlearning/jt.png" description="Junction tree approach. The clusters (colored circles) are selected from a fixed vocabulary and are abstracted away, to form the Junction tree. Both the molecular graph and the Junction tree are separately encoded. The Junction tree is the first to be decoded. The decoded junction tree is combined with the molecular graph hidden representation to decode the clusters sequentially, selecting only the ones that will keep the molecule valid. Image taken from $\href{#4}{[4]}$" w="80" %}
 
 ## Our approach
 
@@ -88,7 +88,7 @@ Desired inductive biases:
 
 To achieve this we perform one-shot prediction (from the latent representation to the graph), without introducing an ordering of the nodes. A big issue this method can have is that when nodes and edges are predicted jointly at once (needed for permutation and isomorphism invariance), generated graphs can be invalid e.g. disconnected graph.
 
-{% include image.html url="molgraphlearning/encoder-decoder.png" description="General Autoencoder pipeline. With our approach, we generate the graph $\hat{G}$ at once using the low-dimensional manifold assumption regarding the target molecular distribution." %}
+{% include image.html url="molgraphlearning/encoder-decoder.png" description="General Autoencoder pipeline. With our approach, we generate the graph $\hat{G}$ at once using the low-dimensional manifold assumption regarding the target molecular distribution." w="95" %}
 
 Note: Regularized VAE $\href{#11}{[11]}$ also generates valid molecules in one-shot by expressing discrete constraints in a differentiable manner. However, they achieve very low validity on small datasets $34.9\%$ and their approach is not permutation invariant (because of the loss function). We compare this our approach in the $\href{#experiments}{Experiments}$ section.
 
@@ -96,13 +96,13 @@ Note: Regularized VAE $\href{#11}{[11]}$ also generates valid molecules in one-s
 
 The molecular graph encoder uses a graph neural network to obtain node embeddings and then uses Deep Sets $\href{#13}{[13]}$ i.e. add embeddings & apply MLP on top, to obtain the molecular embedding.
 
-{% include image.html url="molgraphlearning/encoder.png" description="" %}
+{% include image.html url="molgraphlearning/encoder.png" description="" w="80" %}
 
 # Graph decoder - Issues
 
 Unfortunately, there is no straightforward way to generate a graph from a vector in one shot. Recall that the decoder should preserve permutation invariance w.r.t. to graph nodes, and ensure semantic validity of generated graphs.
 
-{% include image.html url="molgraphlearning/decoder.png" description="" %}
+{% include image.html url="molgraphlearning/decoder.png" description="" w="70" %}
 
 To explain some of the ideas to tackle this, we will make a small introduction to _OT_.
 
@@ -136,14 +136,14 @@ $$
 \end{equation}
 $$
 
-{% include image.html url="molgraphlearning/gw.png" description="" %}
+{% include image.html url="molgraphlearning/gw.png" description="" w="65" %}
 
 # Graph decoder - Dictionary learning idea
 
 Xu H. $\href{#10}{[10]}$ proposed a generalization of dictionary learning for graphs. The idea is that every graph is expressed as a Fréchet mean (GW Barycenter) of learnable dictionary elements and $\lambda$ represents the weights of the dictionary elements.
 {% include image.html url="molgraphlearning/graph-decoder-dictionary-learning.png" description="Dictionary learning for molecules, adapted from the idea in $\href{#10}{[10]}$" %}
 
-{% include image.html url="molgraphlearning/graph-decoder-dictionary-learning-manifold.png" description='Fréchet mean could be used with a generalized notion of distance (Wasserstein or Gromov-Wasserstein) to define the barycenter as an approximation of a molecule on a given graph manifold' %}
+{% include image.html url="molgraphlearning/graph-decoder-dictionary-learning-manifold.png" description='Fréchet mean could be used with a generalized notion of distance (Wasserstein or Gromov-Wasserstein) to define the barycenter as an approximation of a molecule on a given graph manifold' w="70" %}
 
 Caveats: GW Barycenter is hard to backpropagate through. Also we need to combine W and GW to decompose a graph with node and edge features and this has a lot of free parameters. We alternatively do something simpler and easier to train, but keep the idea of dictionary learning.
 
@@ -151,12 +151,12 @@ Caveats: GW Barycenter is hard to backpropagate through. Also we need to combine
 
 Instead of going from the molecular embedding to the molecule directly, we firstly generate a point cloud (node embedding set) from the embedding vector (_Vec2Set_) i.e. we perform dictionary learning on the pointcloud level, and then we predict the node and edge features.
 
-{% include image.html url="molgraphlearning/graph-decoder-alternative.png" description="" %}
+{% include image.html url="molgraphlearning/graph-decoder-alternative.png" description="" w="90" %}
 
 In _Vec2Set_, we wish to generate a pointcloud from a vector $\lambda$ in a permutation invariant way.
 We use the dictionary learning idea discussed previously but on the node embedding level (therefore using the Wasserstein metric which is easier to backpropagate through than GW).
 
-{% include image.html url="molgraphlearning/vec2set-1.png" description="" %}
+{% include image.html url="molgraphlearning/vec2set-1.png" description="" w="90" %}
 
 We use $\lambda$ as the weights and the point clouds / atoms / prototypes are free parameters to be learnt.
 
@@ -182,13 +182,13 @@ We set $\mathbf{B} = \sum_k \lambda_k \mathbf{P}_k$ by adding the extra embeddin
 
 We a predict fixed size point cloud from the latent representation. Then add extra embeddings together to form the point cloud of desired size.
 
-{% include image.html url="molgraphlearning/vec2set-2.png" description="" %}
+{% include image.html url="molgraphlearning/vec2set-2.png" description="" w="85" %}
 
 So we got rid of OT with Linear Interpolation and Non-dictionary learning? At least on this step yes. However, we don't know the alignment of the generated pointcloud and of the generated molecule with the initial one, so we'll need it later :)
 
 # Graph decoder - From pointcloud to discrete graph
 
-{% include image.html url="molgraphlearning/step2.png" description="" %}
+{% include image.html url="molgraphlearning/step2.png" description="" w="80" %}
 
 The following questions naturally arise:
 
@@ -202,7 +202,7 @@ The following questions naturally arise:
 
 On each reconstructed embedding $u$, we apply a neural net $\tilde{F}(u)$ to predict a softmax distribution over the corresponding node feature vector (atom type). Similarly we apply a neural net $\tilde{E}(u,v)$ on pairs of embeddings to predict edges between two nodes.
 
-{% include image.html url="molgraphlearning/predict-features.png" description="" %}
+{% include image.html url="molgraphlearning/predict-features.png" description="" w="80" %}
 
 ## 2. How to define a permutation invariant loss?
 
@@ -230,7 +230,7 @@ _CRFs_ are undirected graphical models for structured prediction that model the 
 
 We can view the node and edge attributes as random variables which have some dependencies e.g. a Carbon node can have at most $4$ bonds. We aim to always predict valid molecules by performing structured prediction on the undirected _CRF_.
 
-{% include image.html url="molgraphlearning/fc.png" description="Example factor graph of an undirected graphical model. $s_1$..$s_5$ are the random variables and $f_1$..$f_5$ are the factors. Factors connect to random variables on which they depend on, and their product it proportional to the conditional distribution of output variables given the observed ones." %}
+{% include image.html url="molgraphlearning/fc.png" description="Example factor graph of an undirected graphical model. $s_1$..$s_5$ are the random variables and $f_1$..$f_5$ are the factors. Factors connect to random variables on which they depend on, and their product it proportional to the conditional distribution of output variables given the observed ones." w="55" %}
 
 Belief propagation is an algorithm that can be used for inference in undirected graphical models. The algorithm is outlined below (initialize messages, iteratively update, compute marginals):
 
@@ -324,7 +324,7 @@ We mainly use ChEMBL [7], which is a molecular dataset of 430K molecules, with a
 
 We need to decode chemically valid molecules otherwise this method can't be used in either property prediction, generation or optimization. Also we can't measure chemical similarity between datasets if the molecules are invalid. Below we show our results with the $3$ different discretization strategies.
 
-{% include image.html url="molgraphlearning/table-1.png" description="" %}
+{% include image.html url="molgraphlearning/table-1.png" description="" w="90" %}
 
 We see that with _Argmax_, we have the highest atom type accuracy (as expected, it has no regularizers), but have extremely low validity mainly caused by invalid valencies (invalid nodes). With the _CRF_, the validity is a bit higher as we manage to satisfy the valence constraints but get a lot of connected components. With the penalty method we manage to easily fit both and get $99.9\%$ validity with a little lower atom type accuracy. Comparing the proposed graph decoders: using the full Wasserstein barycenter doesn’t converge, SingleWB converges, Linear Interpolation converges the fastest, non-dictionary learning performs at most as good as Linear Interpolation when tweaked well.
 
@@ -332,7 +332,7 @@ We see that with _Argmax_, we have the highest atom type accuracy (as expected, 
 
 We compare our apporach with Regularizing VAE $\href{#12}{[12]}$ where they attempt one-shot generation of valid molecules. They use the QM9 $\href{#27}{[27]}$ (small molecules dataset) and ZINC $\href{#9}{[9]}$ datasets.
 
-{% include image.html url="molgraphlearning/table-2.png" description="" %}
+{% include image.html url="molgraphlearning/table-2.png" description="" w="70" %}
 
 QM9 is a dataset with very small molecules (molecules have up to 9 nodes). ZINC is a more realistic dataset where Regularized VAE doesn't perform that well. We also note that MolGAN $\href{#25}{[25]}$ is another previous attempt for generation on top of graph without autoregression. However, they also only report good results on QM9.
 
@@ -340,7 +340,7 @@ QM9 is a dataset with very small molecules (molecules have up to 9 nodes). ZINC 
 
 Our models don't perform greatly regarding Tanimoto similarity. In ChEMBL we achieve Tanimoto similarity of $10.1\%$ (chemical similarity of input and reconstructed molecules). We note that it's easy for Tanimoto similarity to drop with the following example.
 
-{% include image.html url="molgraphlearning/tanimoto-example.png" description="Easy for Tanimoto to drop, 1 bond difference and have $26.7\%$ similarity" %}
+{% include image.html url="molgraphlearning/tanimoto-example.png" description="Easy for Tanimoto to drop, 1 bond difference and have $26.7\%$ similarity" w="40" %}
 
 Even though we manage to reconstruct molecules, if they aren't chemically similar to the input dataset our autoencoder is of little use to downstream tasks. We investigate what causes Tanimoto to drop, by cutting off a part of the pipeline.
 
@@ -351,7 +351,7 @@ Using FGW in this simplified setting (skipping everything inside the box), we st
 
 # Attempt at a downstream task
 
-{% include image.html url="molgraphlearning/adversarial.png" description="Adversarial Autoencoder for generator from Gaussian noise" %}
+{% include image.html url="molgraphlearning/adversarial.png" description="Adversarial Autoencoder for generator from Gaussian noise" w="90" %}
 
 The FCD distance between the test dataset and a 1000 molecule generated dataset is too big (> 100). Our autoencoder has little usefulness due to the low Tanimoto similarity.
 
@@ -377,8 +377,7 @@ And that's it! Thanks for reading this far! Too bad, the application of OT wasn'
 
 <div id="1">[1] Tanimoto, T. T. IBM Internal Report; IBM Corporation: Armonk, NY, Nov 17, 1957.</div>
 <div id="2">[2] Garrett B. Goh, Charles Siegel, Abhinav Vishnu, and Nathan O. Hodas. Using rule-based labels for weak supervised learning: A chemnet for transferable chemical property prediction, 2018.</div>
-<div id="3">[3] Akshat Kumar Nigam, Pascal Friederich, Mario Krenn, and Alan
-Aspuru-Guzik. Augmenting genetic algorithms with deep neural networks for exploring the chemical space. 2019 </div>
+<div id="3">[3] Akshat Kumar Nigam, Pascal Friederich, Mario Krenn, and Alan Aspuru-Guzik. Augmenting genetic algorithms with deep neural networks for exploring the chemical space. 2019 </div>
 <div id="4">[4] Wengong Jin, Regina Barzilay, and Tommi S. Jaakkola. Junction tree variational autoencoder for molecular graph generation. CoRR, abs/1802.04364, 2018.</div>
 <div id="5">[5] Jimeng Sun Tianfan Fu, Cao Xiao. Core: Automatic molecule optimization using copy refine strategy. 2019.</div>
 <div id="6">[6] Greg Landrum et al. Rdkit: Open-source cheminformatics. 2006.</div>
@@ -391,7 +390,7 @@ Aspuru-Guzik. Augmenting genetic algorithms with deep neural networks for explor
 <div id="13">[13] Manzil Zaheer, Satwik Kottur, Siamak Ravanbakhsh, Barnabas Poczos, Russ R Salakhutdinov, and Alexander J Smola. Deep sets. In I. Guyon, U. V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, editors, Advances in Neural Information Processing Systems 30, pages 3391–3401. Curran Associates, Inc., 2017.</div>
 <div id="14">[14] Titouan Vayer, Laetita Chapel, Remi Flamary, Romain Tavenard, and Nicolas Courty. Fused gromov-wasserstein distance for structured objects: theoretical foundations and mathematical properties, 2018.</div>
 <div id="15">[15] Francesco Locatello, Dirk Weissenborn, Thomas Unterthiner, Aravindh Mahendran, Georg Heigold, Jakob Uszkoreit, Alexey Dosovitskiy, and Thomas Kipf. Object-centric learning with slot attention, 2020.</div>
-<div id="16">[16] Matt J. Kusner, Brooks Paige, and Jose Miguel Hern ´ andez-Lobato. ´ Grammar variational autoencoder, 2017.</div>
+<div id="16">[16] Matt J. Kusner, Brooks Paige, and Jose Miguel Hernandez-Lobato. Grammar variational autoencoder, 2017.</div>
 <div id="17">[17] Hanjun Dai, Yingtao Tian, Bo Dai, Steven Skiena, and Le Song. Syntaxdirected variational autoencoder for structured data, 2018.</div>
 <div id="18">[18] Benjamin Sanchez-Lengeling, Carlos Outeiral, Gabriel L. Guimaraes, and Alan Aspuru-Guzik. Optimizing distributions over molecular space. an objective-reinforced generative adversarial network for inverse-design chemistry (organic), Aug 2017.</div>
 <div id="19">[19] Esben Jannik Bjerrum and Richard Threlfall. Molecular generation with recurrent neural networks (rnns), 2017.</div>
