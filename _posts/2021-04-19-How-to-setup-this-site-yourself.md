@@ -11,8 +11,6 @@ This site was built using [Jekyll](https://jekyllrb.com/docs/). You might want t
 
 However, if you're curious about this specific one (e.g. future me)
 
-<br />
-
 ## Theme setup
 
 ```bash
@@ -23,8 +21,6 @@ bundle install
 gem install kramdown
 bundle lock --update
 ```
-
-<br />
 
 ## MathJax support
 
@@ -52,15 +48,11 @@ Now add the following to `_includes/head.html`:
 
 Render LaTex `$$E=mc^2$$`: $$E=mc^2$$
 
-<br />
-
 ## Let's build this
 
 ```
 bundle exec jekyll serve
 ```
-
-<br />
 
 ## Write, write, write
 
