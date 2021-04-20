@@ -21,34 +21,33 @@ More recent developments on _CADD_ that use machine learning techniques $\href{#
 
 # Chemistry basics
 
-In this work we model molecules as graphs with node attributes (e.g. atom type - Carbon/Oxygen/.., charge etc) and edge attributes (e.g. bond type - single/double/triple bond, depth etc). To use this abstraction we need to understand what constraints are necessary for a molecular graph to be a semantically valid molecule e.g. a carbon with 0 charge can make up to $4$ bonds. Note that this is a simplification of reality (e.g. hypervalent atoms don't follow the valency rules), but is a common practice in chemoinformatics (e.g. RDKit $\href{#6}{[6]}$). For chemistry-inclined audience, we are working with organic compounds with covalent bonds and charged atoms are formed using a solvent / dilution. All the molecules considered are in "Kekulized" form (we assign bond orders to aromatic bonds s.t. the valence constraints are satisfied) with Hydrogens removed.
+In this work we model molecules as graphs with node attributes (e.g. atom type - Carbon/Oxygen/.., charge etc) and edge attributes (e.g. bond type - single/double/triple bond, depth etc). To use this abstraction we need to understand what constraints are necessary for a molecular graph to be a semantically valid molecule e.g. a carbon with $0$ charge can make up to $4$ bonds. Note that this is a simplification of reality (e.g. hypervalent atoms don't follow the standard valency rules), but it's common practice in chemoinformatics (e.g. see RDKit $\href{#6}{[6]}$). For chemistry-inclined audience, we are working with organic compounds with covalent bonds and charged atoms are formed using a solvent / dilution. All the molecules considered are in "Kekulized" form (we assign bond orders to aromatic bonds s.t. the valence constraints are satisfied) with Hydrogens removed.
 
 {% include image.html url="molgraphlearning/chem-basics.png" description="Example molecule (acetonitrile). On the left we see a 3D visualization. On the right we see a molecular graph with node and edge features representing the molecule." %}
 
-For a molecular graph to be semantically valid we require
+For a molecular graph to be semantically valid we require:
 
-- Connectivity: single connected component
-- Valence: degree constraint for every atom in the molecule e.g. Carbon (C) up to 4 bonds, Nitrogen (N) up to 3 etc
+- Connectivity constraint: single connected component
+- Valence constraint: degree constraint for every atom in the molecule e.g. Carbon (C) up to $4$ bonds, Nitrogen (N) up to $3$ etc
 
 Additionally, to compare with the generated molecules we use the following chemically-aware metrics:
 
-- Tanimoto similarity coefficient: Chemical property similarity measure, uses Morgan fingerprints $\href{#1}{[1]}$
-- FCD: Measure how close 2 molecular distributions are, using pertained latent representations of molecules $\href{#2}{[2]}$
+- Tanimoto similarity coefficient $\href{#1}{[1]}$: Chemical property similarity measure, uses Morgan fingerprints
+- FCD $\href{#2}{[2]}$: Measures how close $2$ molecular distributions are, using pertained latent representations of molecules
 
 # Prior work
 
-We do a quick review of prior work that learns a latent space for molecules with applications in generation, optimization and property prediction. In generation we model the distribution of the latent space, in optimization we optimize on the latent space wrt some property and in property prediction we use the latent space as pertained embeddings.
+We do a quick review of prior work that learns a latent space for molecules for generation, optimization and property prediction. In generation they model the distribution of the latent space, in optimization they optimize on the latent space w.r.t. some property and in property prediction they use the latent space as pertained embeddings.
 
 ## String representations of moleculels (SMILES, SELFIES)
 
-Represent molecules as strings using some parsing algorithm $\href{#16}{[16]} \href{#17}{[17]} \href{#18}{[18]} \href{#19}{[19]} \href{#20}{[20]}$.
+Represent molecules as strings using some parsing algorithm on top of the molecular graph $\href{#16}{[16]} \href{#17}{[17]} \href{#18}{[18]} \href{#19}{[19]} \href{#20}{[20]}$.
 
 Pros/Cons:
 
-- Re-use SOTA NLP methods
-
-* String representations are not designed to capture molecular similarity, chemically similar molecules can have very different string representations
-* Seq2Seq / Transformer methods on top of strings are not permutation invariant w.r.t. graph nodes
+- (+) Re-use SOTA NLP methods
+- (-) String representations are not designed to capture molecular similarity, chemically similar molecules can have very different string representations
+- (-) Seq2Seq / Transformer methods on top of strings are not permutation invariant w.r.t. graph nodes
 
 {% include image.html url="molgraphlearning/smiles-example.png" description="SMILES string for a particular molecule" %}
 
@@ -58,25 +57,23 @@ Autoregressive approaches operate on graphs. They assume a node or edge ordering
 
 Pros/Cons:
 
-- Can always generate valid molecules by filtering the allowed actions at each step
-
-* Not permutation invariant w.r.t. graph nodes
-* Problematic for big molecules (hard to model long-term dependencies)
+- (+) Can always generate valid molecules by filtering the allowed actions at each step
+- (-) Not permutation invariant w.r.t. graph nodes
+- (-) Problematic for big molecules (hard to model long-term dependencies)
 
 {% include image.html url="molgraphlearning/autoregressive.png" description="Generating a molecule atom-by-atom" %}
 
 ## Junction Tree models
 
-Junction tree models $\href{#26}{[26]} \href{#27}{[27]}$ assume a fixed vocabulary of building blocks which can be combined to construct graphs. Encoding / decoding has 2 steps: the tree structured skeleton of the molecule, the subgraph that is represented by each node in the tree graph.
+Junction tree models $\href{#26}{[26]} \href{#27}{[27]} \href{#9}{[9]}$ assume a fixed vocabulary of building blocks which can be combined to construct graphs. Encoding / decoding involve $2$ steps: the tree structured skeleton of the molecule, the subgraph that is represented by each node in the tree graph.
 
 Pros/Cons:
 
-- Unclear what is the best vocabulary of subgraphs + limits the expressiveness of the model
-- Junction tree not unique and not guaranteed to exist
-- No permutation and isomorphism invariance
-
-* Can enforce validity by filtering the predicted subgraphs
-* Can model bigger molecules easier than autoregressive approaches
+- (+) Can enforce validity by filtering the predicted subgraphs
+- (+) Can model bigger molecules easier than autoregressive approaches
+- (-) Unclear what is the best vocabulary of subgraphs + limits the expressiveness of the model
+- (-) Junction tree not unique and not guaranteed to exist
+- (-) No permutation and isomorphism invariance
 
 {% include image.html url="molgraphlearning/jt.png" description="Junction tree approach. The clusters (colored circles) are selected from a fixed vocabulary and are abstracted away, to form the Junction tree. Both the molecular graph and the Junction tree are separately encoded. The Junction tree is the first to be decoded. The decoded junction tree is combined with the molecular graph hidden representation to decode the clusters sequentially, selecting only the ones that will keep the molecule valid. Image taken from $\href{#9}{[9]}$" %}
 
@@ -89,15 +86,15 @@ Desired inductive biases:
 - No fixed vocabulary
 - Operate on graphs
 
-To achieve this we perform one shot prediction (from the latent representation to the graph), without ordering of the nodes. A big issue this method can have is that when nodes and edges are predicted jointly at once (needed for permutation and isomorphism invariance), generated graphs can be invalid e.g. disconnected graph.
+To achieve this we perform one-shot prediction (from the latent representation to the graph), without introducing an ordering of the nodes. A big issue this method can have is that when nodes and edges are predicted jointly at once (needed for permutation and isomorphism invariance), generated graphs can be invalid e.g. disconnected graph.
 
 {% include image.html url="molgraphlearning/encoder-decoder.png" description="General Autoencoder pipeline. With our approach, we generate the graph $\hat{G}$ at once using the low-dimensional manifold assumption regarding the target molecular distribution." %}
 
-Note: Regularized VAE $\href{#11}{[11]}$ also generates valid molecules in one-shot by expressing discrete constraints in a differentiable manner. However, they achieve very low validity on small datasets 34.9% and their approach is not permutation invariant (because of the loss function).
+Note: Regularized VAE $\href{#11}{[11]}$ also generates valid molecules in one-shot by expressing discrete constraints in a differentiable manner. However, they achieve very low validity on small datasets $34.9%$ and their approach is not permutation invariant (because of the loss function). We compare this our approach in the $\href{#experiments}{Experiments}$ section.
 
 # Graph encoder
 
-The molecular graph encoder uses a graph neural network to obtain node embeddings and then uses DeepSets $\href{#13}{[13]}$ i.e. add embeddings & apply MLP on top, to obtain the molecular embedding.
+The molecular graph encoder uses a graph neural network to obtain node embeddings and then uses Deep Sets $\href{#13}{[13]}$ i.e. add embeddings & apply MLP on top, to obtain the molecular embedding.
 
 {% include image.html url="molgraphlearning/encoder.png" description="" %}
 
@@ -107,17 +104,17 @@ Unfortunately, there is no straightforward way to generate a graph from a vector
 
 {% include image.html url="molgraphlearning/decoder.png" description="" %}
 
-To explain some of the ideas to tackle this, we will make a small introduction to OT.
+To explain some of the ideas to tackle this, we will make a small introduction to _OT_.
 
 # Optimal Transport intro
 
-Optimal transport (OT) studies the possible ways to morph a source measure $\mu$ into a target measure $\nu$, with special interest in the properties of the least costly way to achieve that and its efficient computation. Here we consider probability measures (with total volume 1) and work with the Wasserstein distance and the Gromov-Wasserstein discrepancy.
+Optimal transport (_OT_) studies the possible ways to morph a source measure $\mu$ into a target measure $\nu$, with special interest in the properties of the least costly way to achieve that and its efficient computation. Here we consider probability measures (with total volume $1$) and work with the Wasserstein distance and the Gromov-Wasserstein discrepancy.
 
-For simplicity, we assume that the measures are uniform over the sets they are defined over (equal mass at each point), and represent these uniform measures with pointclouds e.g. if a pointcloud has 5 points, each points carries 0.2 mass.
+For simplicity, we assume that the measures are uniform over the sets they are defined over (equal mass at each point), and represent these uniform measures with pointclouds e.g. if a pointcloud has $5$ points, each points carries $0.2$ mass.
 
 ## Wasserstein distance
 
-Wasserstein distance, we take 2 such pointclouds in the same metric measure space (but possibly of different number of points) and a cost function (e.g. L2), and find the optimal way to morph one into the other.
+Wasserstein distance, we take $2$ such pointclouds in the same metric measure space (but possibly of different number of points) and a cost function (e.g. _L2_), and find the optimal way to morph one into the other.
 
 {% include image.html url="molgraphlearning/w.png" description="" %}
 
@@ -150,7 +147,7 @@ Instead of going from the molecular embedding to the molecule directly, we first
 
 {% include image.html url="molgraphlearning/graph-decoder-alternative.png" description="" %}
 
-In Vec2Set, we wish to generate a pointcloud from a vector $\lambda$ in a permutation invariant way.
+In _Vec2Set_, we wish to generate a pointcloud from a vector $\lambda$ in a permutation invariant way.
 We use the dictionary learning idea discussed previously but on the node embedding level (and therefore using the Wasserstein metric).
 
 {% include image.html url="molgraphlearning/vec2set-1.png" description="" %}
@@ -213,7 +210,7 @@ To put this into perspective, we use optimal transport as a way to define a geom
 
 ## 3. How to ensure the graph is a valid molecule?
 
-As expected, this proves to be the hardest part of the puzzle. We explore 3 methods.
+As expected, this proves to be the hardest part of the puzzle. We explore $3$ methods.
 
 - Argmax
 - CRF for structured prediction on top of logits
@@ -309,7 +306,7 @@ Cap value is the max eigenvalue we penalize (extract minimum eigenvalue from dat
 
 > Euler constraint penalty
 
-Since we work with 2D graphs we can use the Euler characteristic $\|V\| - \|E\| + \|F\| = 2$. Since $\|F\| = \|Cycles\| + 1$ and empirically 99.9% of the molecules have up to $6$ cycles:
+Since we work with 2D graphs we can use the Euler characteristic $\|V\| - \|E\| + \|F\| = 2$. Since $\|F\| = \|Cycles\| + 1$ and empirically $99.9%$ of the molecules have up to $6$ cycles:
 
 $penalty_{euler} = min(0, \|V\| - 1 - \|E\|) + min(0, \|E\| - \|V\| - 5)$
 
@@ -335,16 +332,16 @@ QM9 is a dataset with very small molecules (with molecules up to 9 nodes). ZINC 
 
 ## Tanimoto similarity
 
-Our models don't perform greatly. In ChEMBL we achieve Tanimoto similarity of 10.1% (chemical similarity of input and reconstructed molecules). We note that it's easy for Tanimoto similarity to drop with the following example.
+Our models don't perform greatly. In ChEMBL we achieve Tanimoto similarity of $10.1%$ (chemical similarity of input and reconstructed molecules). We note that it's easy for Tanimoto similarity to drop with the following example.
 
-{% include image.html url="molgraphlearning/tanimoto-example.png" description="Easy for Tanimoto to drop, 1 bond difference and have 26.7% similarity" %}
+{% include image.html url="molgraphlearning/tanimoto-example.png" description="Easy for Tanimoto to drop, 1 bond difference and have $26.7%$ similarity" %}
 
 Even though we manage to reconstruct molecules, if they aren't chemically similar to the input dataset our autoencoder is of little use to downstream tasks. We investigate what causes Tanimoto to drop, by cutting off a part of the pipeline.
 
 {% include image.html url="molgraphlearning/tanimoto-pipeline.png" description="" %}
 
 Instead of collapsing to a single latent representation using Set2Vec we keep the node embeddings and decode directly. We remove therefore a part of the autoencoder (everything inside the black box). We know the node correspondences of the input and the output so we can also use L2 apart from FGW.
-Using FGW we still get 10% Tanimoto similarity even when we skip the entire part in the box. Using L2 we get Tanimoto > 50%. This means that GNN embeddings are not too weak since L2 succeeds in recovering the node and edge features from them. FGW is not strong enough to correlate the independent predictions of node and edge types.
+Using FGW we still get $10%$ Tanimoto similarity even when we skip the entire part in the box. Using L2 we get Tanimoto > $50%$. This means that GNN embeddings are not too weak since L2 succeeds in recovering the node and edge features from them. FGW is not strong enough to correlate the independent predictions of node and edge types.
 
 # Attempt at a downstream task
 
