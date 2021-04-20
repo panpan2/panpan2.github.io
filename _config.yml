@@ -15,7 +15,7 @@ author:
   url: http://panpan2.github.io
 permalink: pretty
 
-baseurl: /panpan2.github.io
+baseurl: ""
 
 highlighter: rouge
 
