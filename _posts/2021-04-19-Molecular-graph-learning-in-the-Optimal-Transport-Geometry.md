@@ -11,13 +11,13 @@ toc: true
 
 ### What
 
-This blog post is short summary of my master thesis "Molecular graph learning in the Optimal Transport Geometry" at ETH Zurich under the supervision of Thomas Hoffman, Octavian Ganea and Gary Bécingeul (10/10/2020). In this work, we are concerned with learning a latent space for molecular graphs and using Optimal Transport ([OT](<https://en.wikipedia.org/wiki/Transportation_theory_(mathematics)>))) to define a geometry and measure distances between molecules. This latent space can be later used for downstream tasks such as generating molecules, property prediction or molecule optimization.
+This blog post is short summary of my master thesis "Molecular graph learning in the Optimal Transport Geometry" done at ETH Zurich under the supervision of Thomas Hoffman, Octavian Ganea and Gary Bécingeul (10/10/2020). In this work, we are concerned with learning a latent space for molecular graphs and define a geometry and measure distances between molecules using Optimal Transport ([OT](<https://en.wikipedia.org/wiki/Transportation_theory_(mathematics)>))). This latent space can be later used for downstream tasks such as generating molecules, property prediction or molecule optimization.
 
 ### Why
 
 In traditional computer-aided drug design (_CADD_), molecules formed with hand-crafted bond rules are enumerated and evaluated against some property of interest (e.g. obtaining more potent drugs with fewer side effects). While this technique has the advantage that it leaves us with knowledge of how to synthesize a molecule, it’s an untargeted search over a small subspace of the gigantic chemical space that remains vastly unexplored.
 
-More recent developments on _CADD_ that use machine learning techniques $\href{#3}{[3]} \href{#4}{[4]} \href{#5}{[5]}$, focus largely on learning a mapping from the discrete chemical space to a continuous lower-dimensional space and vice versa if needed. In this setting, the ability to sample from the continuous latent space allows for downstream tasks such as molecular graph generation, optimization on the continuous latent space allows for molecular optimization and property prediction can be trained using the latent representation encoding.
+More recent developments on _CADD_ that use machine learning techniques $\href{#3}{[3]} \href{#4}{[4]} \href{#5}{[5]}$, focus largely on learning a mapping from the discrete chemical space to a continuous lower-dimensional space and vice versa. This continuous latent space allows for downstream tasks such as molecular generation, optimization and property prediction.
 
 # Chemistry basics
 
@@ -33,7 +33,7 @@ For a molecular graph to be semantically valid we require
 Additionally, to compare with the generated molecules we use the following chemically-aware metrics:
 
 - Tanimoto similarity coefficient: Chemical property similarity measure, uses Morgan fingerprints $\href{#1}{[1]}$
-- FCD: Measure how close 2 molecular distributions are, using pertained latent representations of molecules c
+- FCD: Measure how close 2 molecular distributions are, using pertained latent representations of molecules $\href{#2}{[2]}$
 
 # Prior work
 
@@ -93,7 +93,7 @@ To achieve this we perform one shot prediction (from the latent representation t
 
 {% include image.html url="molgraphlearning/encoder-decoder.png" description="General Autoencoder pipeline. With our approach, we generate the graph $\hat{G}$ at once using the low-dimensional manifold assumption regarding the target molecular distribution." %}
 
-Note: Regularized VAE $\href{#11}{[11]}$ also generates valid molecules in one-shot by expressing discrete constraints in a differentiable manner. However, they achieve very low validity on small datasets 34.9\% and their approach is not permutation invariant (because of the loss function).
+Note: Regularized VAE $\href{#11}{[11]}$ also generates valid molecules in one-shot by expressing discrete constraints in a differentiable manner. However, they achieve very low validity on small datasets 34.9% and their approach is not permutation invariant (because of the loss function).
 
 # Graph encoder
 
@@ -125,11 +125,11 @@ Wasserstein distance, we take 2 such pointclouds in the same metric measure spac
 
 Wasserstein distance needs a ground cost function $c$ to compare two points and thus can not be defined if those points are not defined on the same underlying space - or if we cannot preregister these spaces and define a cost between each pair of points of the two spaces.
 
-Gromov-Wasserstein (\textit{GW}) addresses this limitation by using two matrices $\Am$, $\Bm$ to quantify similiarity relationships within the two different metric measure spaces $\Xcm$ and $\Ycm$ respectively. This way we can relate graphs in terms of their structure e.g. comparing their shortest distance matrices.
+Gromov-Wasserstein (_GW_) addresses this limitation by using two matrices $\mathbf{A}$, $\mathbf{B}$ to quantify similiarity relationships within the two different metric measure spaces $\mathcal{X}$ and $\mathcal{Y}$ respectively. This way we can relate graphs in terms of their structure e.g. comparing their shortest distance matrices.
 
 $$
 \begin{equation}
-    \mathcal{GW}(\Am, \Bm) = \min_{\Tm \in \mathcal{C}_{\Xcm \Ycm}} \sum\limits_{ij} \sum\limits_{kl} \Tm_{ij} \Tm_{kl} c(\Am_{ik}, \Bm_{jl})
+    \mathcal{GW}(\mathbf{A}, \mathbf{B}) = \min_{\mathbf{T} \in \mathcal{C}_{\mathcal{X} \mathcal{Y}}} \sum\limits_{ij} \sum\limits_{kl} \mathbf{T}_{ij} \mathbf{T}_{kl} c(\mathbf{A}_{ik}, \mathbf{B}_{jl})
 \end{equation}
 $$
 
@@ -155,15 +155,21 @@ We use the dictionary learning idea discussed previously but on the node embeddi
 
 {% include image.html url="molgraphlearning/vec2set-1.png" description="" %}
 
-We use $\lambda$ as the weights and the point clouds / atoms / prototypes are free parameters to be learnt. With pointclouds $\mathbf{P_i}_{i=1}^K$, weights $\lambda \in \Delta^{K-1}$ we can compute the permutation invariant Wasserstein barycenter $\mathbf{B}$ s.t. $arg\min_{\mathbf{B}}\sum_{i=1}^{K} \lambda_i \mathcal{W}(\mathbf{B}, \mathbf{P}_i)$ (we can memorize the number of input nodes to use it when decoding, and sample it on generation/optimization)
-This is equivalent to doing optimal transport based clustering, see $\href{#8}{[8]}$
-In practice this proves to be very slow and hard to train. We use 2 simplified approaches.
+We use $\lambda$ as the weights and the point clouds / atoms / prototypes are free parameters to be learnt.
+
+With pointclouds ${\\{\mathbf{P}_i\\}}\_{i=1}^K$, weights $\lambda \in \Delta^{K-1}$ we can compute the permutation invariant Wasserstein barycenter $\mathbf{B}$ s.t.
+
+$$arg\min_{\mathbf{B}}\sum_{i=1}^{K} \lambda_i \mathcal{W}(\mathbf{B}, \mathbf{P}_i)$$
+
+Regarding the number off nodes when decoding, we can memorize the number of input nodes and sample it on generation/optimization. This is equivalent to doing optimal transport based clustering, see $\href{#8}{[8]}$.
+
+In practice this proves to be very slow and hard to train :( So we resort to 2 simplified approaches.
 
 ## SingleWB
 
 Assume the points in the point clouds have an apriori fixed matching. This is not too restrictive as these prototypes are free parameters and it doesn’t compromise permutation invariance of the model. It just requires that all pointclouds have the same size.
 
-$arg\min_{\mathbf{B}}\sum_{i=1}^{K} \lambda_i \mathcal{W}(\mathbf{B}, \mathbf{P}_i)$ simplifies to $arg\min_{\mathbf{B}} \mathcal{W}(\mathbf{B}, \sum_{i=1}^{K} \lambda_i \mathbf{P}_i)$. Note that $\mathbf{B}$ can have a different number of points than the pointcloud weighted average, hence the Wasserstein barycenter is still required.
+$arg\min_{\mathbf{B}}\sum_{i=1}^{K} \lambda_i \mathcal{W}(\mathbf{B}, \mathbf{P}\_i)$ simplifies to $arg\min_{\mathbf{B}} \mathcal{W}(\mathbf{B}, \sum_{i=1}^{K} \lambda_i \mathbf{P}_i)$. Note that $\mathbf{B}$ can have a different number of points than the pointcloud weighted average, hence the Wasserstein barycenter is still required.
 
 ## LinearInterpolation
 
@@ -219,7 +225,7 @@ Argmax is pretty self-explanatory and used as a comparative baseline. We just pi
 
 ### CRF for structured prediction on top of logits
 
-CRFs are undirected graphical models for structured prediction that model the conditional distribution P(y | x), where y are the output variables and x the observed variables, as the product of some factors subject to normalization, $P(\mathbf{y}|\mathbf{x}) \propto \prod_f f(\mathbf{y}, \mathbf{x})$. In our case the observed variables are the logits and the output variables is the final reconstruction. The CRF represent the probability distribution as a the product of some local factors each of which depends on a subset of variables.
+CRFs are undirected graphical models for structured prediction that model the conditional distribution $P(y \| x)$, where $y$ are the output variables and $x$ the observed variables, as the product of some factors subject to normalization, $P(\mathbf{y}\|\mathbf{x}) \propto \prod_f f(\mathbf{y}, \mathbf{x})$. In our case the observed variables are the logits and the output variables is the final reconstruction. The CRF represent the probability distribution as a the product of some local factors each of which depends on a subset of variables.
 
 We can view the node and edge attributes as random variables which have some dependencies e.g. a carbon node can have at most 4 bonds. We aim to always predict valid molecules by performing structured prediction on the undirected CRF.
 
@@ -239,18 +245,37 @@ The computational bottleneck of message passing lies in the $\mu_{f \rightarrow 
 
 For observed variables (logits) $\tilde{F}(u)$ (nodes), $\tilde{E}(u, v)$ (edges), output variables $\hat{F}(u)$ (nodes), $\hat{E}(u, v)$ (edges), we define the following factors (think of them as the dependencies between the variables)
 
-$\Psi_{node_i}(\tilde{F}(i)) = exp(w_{node} \tilde{F}(i))$
-$\Psi_{edge_{ij}}(\tilde{E}(i, j)) = exp(w_{edge} \tilde{E}(i, j))$
-$    \Psi_{val_i}(\hat{F}(i), \hat{E}(i, j) \, \forall j \in \{1..i-1,i+1,..n\}) = 
+$$
+\begin{equation*}
+\Psi_{node_i}(\tilde{F}(i)) = exp(w_{node} \tilde{F}(i))
+\end{equation*}
+$$
+
+$$
+\begin{equation*}
+\Psi_{edge_{ij}}(\tilde{E}(i, j)) = exp(w_{edge} \tilde{E}(i, j))
+\end{equation*}
+$$
+
+$$
+\begin{equation*}
+\Psi_{val_i}(\hat{F}(i), \hat{E}(i, j) \, \forall j \in \{1..i-1,i+1,..n\}) =
     \begin{cases}
         \text{1} &\quad valency(\hat{F}(i)) \geq \sum\limits_j^n valency(\hat{E}(i, j))\\
         \text{0} &\quad \text{otherwise}\\
-    \end{cases}    $
-$    \Psi_{conn}(\hat{E}(i, j) \, \forall i, j: i < j \; i, j \in \{1..n\}) = 
+    \end{cases}
+\end{equation*}
+$$
+
+$$
+\begin{equation*}
+\Psi_{conn}(\hat{E}(i, j) \, \forall i, j: i < j \; i, j \in \{1..n\}) =
     \begin{cases}
         \text{1} &\quad \text{BFS from a node can reach all others}\\
         \text{0} &\quad \text{otherwise}\\
-    \end{cases}    $
+    \end{cases}
+\end{equation*}
+$$
 
 For $\mathbf{T}=10$ message passing iterations connectivity is not tractable. Valency tractable (using pruning, considering the top 6 most probable edges instead of all possible per node). Spoiler (or not): Valence enforcement works well but connectivity causes low validity.
 
@@ -262,31 +287,31 @@ The penalty method idea is to replace the constrained optimization problem, wher
 
 We can sample using Gumbel softmax, softmax with temperature etc. Here we show only softmax with temperature, as we got more stable training with it. We can samplel from logits $z_i$ using a temperature $\tau$. The smaller it is, the more one-hot are the post-softmax probabilities.
 
-$y_i = \frac{exp(\frac{z_i}{\tau})}{\sum_j exp(\frac{z_j}{\tau})}$
+$$y_i = \frac{exp(\frac{z_i}{\tau})}{\sum_j exp(\frac{z_j}{\tau})}$$
 
 > Valence constraint penalty
 
 Compute for each node i, the expected actual degree E(i) (from the predicted bonds) and the expected maximum degree M(i) (from the maximum valency of the predicted atom type) - minimum degree is 1 to be connected.
 
-$penalty_{valence} = \sum_{\text{node }i} min(0,\, 1 - E(i)) + min(0, \, E(i) - M(i))$
+$$penalty_{valence} = \sum_{\text{node }i} min(0,\, 1 - E(i)) + min(0, \, E(i) - M(i))$$
 
 > Connectivity constraint penalty
 
 The Laplacian matrix $\mathbf{L}$, is a matrix representation of the graph ($\mathbf{E}_{ij}$ edges of sampled graph).
 
-$\mathbf{L}_{kl} = \begin{cases} \sum_{m \neq k} E_{km} & \text{, if } k = l,\\ -E_{kl} & \text{, if } k \neq l\end{cases}$
+$$\mathbf{L}_{kl} = \begin{cases} \sum_{m \neq k} E_{km} & \text{, if } k = l,\\ -E_{kl} & \text{, if } k \neq l\end{cases}$$
 
 Theorem$\href{#12}{[12]}$: $\mathbf{L}$ is symmetric and positive semidefinite. If $L + \frac{1}{N}\mathbf{1}_N\mathbf{1}_N^T$ is strictly positive definite then the graph is connected. This happens when the eigenvalues are positive.
 
-$penalty_{connectivity} = log(\frac{cap\_value ^ N}{\prod_i eig_i})$
+$$penalty_{connectivity} = log(\frac{cap\_value ^ N}{\prod_i eig_i})$$
 
 Cap value is the max eigenvalue we penalize (extract minimum eigenvalue from dataset). We therefore clamp eigenvalues, and the penalty becomes 0 when all eigenvalues are above the cap value.
 
 > Euler constraint penalty
 
-Since we work with 2D graphs we can use the Euler characteristic $|V| - |E| + |F| = 2$. Since $|F| = |Cycles| + 1$ and empirically 99.9\% of the molecules have up to $6$ cycles:
+Since we work with 2D graphs we can use the Euler characteristic $\|V\| - \|E\| + \|F\| = 2$. Since $\|F\| = \|Cycles\| + 1$ and empirically 99.9% of the molecules have up to $6$ cycles:
 
-$penalty_{euler} = min(0, |V| - 1 - |E|) + min(0, |E| - |V| - 5)$
+$penalty_{euler} = min(0, \|V\| - 1 - \|E\|) + min(0, \|E\| - \|V\| - 5)$
 
 # Experiments
 
@@ -296,30 +321,30 @@ We mainly use the ChEMBL [7], which is a molecular dataset of 430K molecules, wi
 
 We need to decode chemically valid molecules otherwise this method can't be used in either property prediction, generation or optimization. Also we can't measure chemical similarity between datasets if the molecules are invalid.
 
-{% include image.html url="molgraphlearning/table1.png" description="" %}
+{% include image.html url="molgraphlearning/table-1.png" description="" %}
 
-We see that with argmax, we have the highest atom type accuracy (no regularizers, as expected), but have extremely low validity mainly caused by invalid valencies (invalid nodes). With the CRF, the validity is a bit higher as we manage to satisfy the valence constraints but get a lot of connected components. With the penalty method we manage to easily fit both and get 99.9\% accuracy with a little hurt atom type accuracy. Comparing our decoders: using the full Wasserstein barycenter doesn’t converge, SingleWB converges, LinearInterpolation converges the fastest, non-dictionary learning performs at most as good as LinearInterpolation when tweaked well.
+We see that with argmax, we have the highest atom type accuracy (no regularizers, as expected), but have extremely low validity mainly caused by invalid valencies (invalid nodes). With the CRF, the validity is a bit higher as we manage to satisfy the valence constraints but get a lot of connected components. With the penalty method we manage to easily fit both and get 99.9% accuracy with a little hurt atom type accuracy. Comparing our decoders: using the full Wasserstein barycenter doesn’t converge, SingleWB converges, LinearInterpolation converges the fastest, non-dictionary learning performs at most as good as LinearInterpolation when tweaked well.
 
 ## Comparison with previous attempt
 
 We compare our apporach with Regularizing VAE $\href{#12}{[12]}$: one-shot generation of valid molecules. They use the QM9 $\href{#28}{[28]}$ (small molecules dataset) and ZINC $\href{#29}{[29]}$ datasets.
 
-{% include image.html url="molgraphlearning/table2.png" description="" %}
+{% include image.html url="molgraphlearning/table-2.png" description="" %}
 
 QM9 is a dataset with very small molecules (with molecules up to 9 nodes). ZINC is a more realistic dataset where Regularized VAE doesn't perform that well. We also note that MolGAN $\href{#25}{[25]}$ is another previous attempt for generation on top of graph without autoregression. However, they also only report good results on QM9.
 
 ## Tanimoto similarity
 
-Our models don't perform greatly. In ChEMBL we achieve Tanimoto similarity of 10.1\% (chemical similarity of input and reconstructed molecules). We note that it's easy for Tanimoto similarity to drop with the following example.
+Our models don't perform greatly. In ChEMBL we achieve Tanimoto similarity of 10.1% (chemical similarity of input and reconstructed molecules). We note that it's easy for Tanimoto similarity to drop with the following example.
 
-{% include image.html url="molgraphlearning/tanimoto-example.png" description="Easy for Tanimoto to drop, 1 bond difference and have 26.7\% similarity" %}
+{% include image.html url="molgraphlearning/tanimoto-example.png" description="Easy for Tanimoto to drop, 1 bond difference and have 26.7% similarity" %}
 
 Even though we manage to reconstruct molecules, if they aren't chemically similar to the input dataset our autoencoder is of little use to downstream tasks. We investigate what causes Tanimoto to drop, by cutting off a part of the pipeline.
 
 {% include image.html url="molgraphlearning/tanimoto-pipeline.png" description="" %}
 
 Instead of collapsing to a single latent representation using Set2Vec we keep the node embeddings and decode directly. We remove therefore a part of the autoencoder (everything inside the black box). We know the node correspondences of the input and the output so we can also use L2 apart from FGW.
-Using FGW we still get 10\% Tanimoto similarity even when we skip the entire part in the box. Using L2 we get Tanimoto > 50\%. This means that GNN embeddings are not too weak since L2 succeeds in recovering the node and edge features from them. FGW is not strong enough to correlate the independent predictions of node and edge types.
+Using FGW we still get 10% Tanimoto similarity even when we skip the entire part in the box. Using L2 we get Tanimoto > 50%. This means that GNN embeddings are not too weak since L2 succeeds in recovering the node and edge features from them. FGW is not strong enough to correlate the independent predictions of node and edge types.
 
 # Attempt at a downstream task
 
