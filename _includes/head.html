@@ -46,19 +46,34 @@
 
   <!-- for mathjax support -->
   {% if page.usemathjax %}
-  <!-- <script type="text/x-mathjax-config">
+  <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
-    TeX: { equationNumbers: { autoNumber: "AMS" } }
+      TeX: { equationNumbers: { autoNumber: "AMS" } },
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true,
+        processEnvironments: true
+      }
     });
   </script>
-  <script
-    type="text/javascript"
-    async
-    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"
-    https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full
-  ></script> -->
 
-  <script type="text/x-mathjax-config">
+  <!-- <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      config: ["MMLorHTML.js"],
+      jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML"],
+      extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+      TeX: {
+        extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+      },
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        processEscapes: true
+      }
+    });
+  </script>
+   -->
+  <!-- <script type="text/x-mathjax-config">
       MathJax.Hub.Config({
         jax: ["input/TeX","input/MathML","output/SVG", "output/CommonHTML"],
     extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js", "CHTML-preview.js"],
@@ -73,7 +88,7 @@
         },
         "HTML-CSS": { availableFonts: ["TeX"] }
       });
-  </script>
+  </script> -->
   <script
     type="text/javascript"
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"
