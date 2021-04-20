@@ -1,7 +1,10 @@
 <figure class="image">
-  <img
-    src="../../../assets/images/{{ include.url }}"
-    alt="{{ include.description }}"
-  />
-  <figcaption>{{ include.description }}</figcaption>
+  <div style="text-align: center">
+    <img
+      style="max-width: {{ include.w }}%; height: auto; "
+      src="../../../assets/images/{{ include.url }}"
+      alt="{{ include.description }}"
+    />
+    <figcaption>{{ include.description }}</figcaption>
+  </div>
 </figure>
