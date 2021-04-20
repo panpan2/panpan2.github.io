@@ -25,8 +25,6 @@ In this work we model molecules as graphs with node attributes (e.g. atom type -
 
 {% include image.html url="molgraphlearning/chem-basics.png" description="Example molecule (acetonitrile). On the left we see a 3D visualization. On the right we see a molecular graph with node and edge features representing the molecule." %}
 
-![](/images/molgraphlearning/chem-basics.png)
-
 For a molecular graph to be semantically valid we require:
 
 - Connectivity constraint: single connected component
