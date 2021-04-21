@@ -11,7 +11,7 @@ toc: true
 
 ### What
 
-This blog post is short summary of my master thesis "Molecular graph learning in the Optimal Transport Geometry" done at ETH Zurich under the supervision of Thomas Hoffman, Octavian Ganea and Gary Bécingeul (10/10/2020). In this work, we are concerned with learning a latent space for molecular graphs and define a geometry and measure distances between molecules using Optimal Transport ([OT](<https://en.wikipedia.org/wiki/Transportation_theory_(mathematics)>)). This latent space can be later used for downstream tasks such as generating molecules, property prediction or molecule optimization.
+This blog post is short article about my master thesis "Molecular graph learning in the Optimal Transport Geometry" done at ETH Zurich under the supervision of Prof. Thomas Hofmann (ETH), Dr. Octavian Ganea (MIT) and Dr. Gary Bécingeul (ETH) (10/10/2020). Parts of this work were collaborative with Octav Dragoi (TUM) who was working on "Optimizing Molecular Graphs in the Wasserstein Space". In this work, we are concerned with learning a latent space for molecular graphs and define a geometry to measure distances between molecules using Optimal Transport ([OT](<https://en.wikipedia.org/wiki/Transportation_theory_(mathematics)>)). This latent space can be later used for downstream tasks such as generating molecules, property prediction or molecule optimization.
 
 ### Why
 
