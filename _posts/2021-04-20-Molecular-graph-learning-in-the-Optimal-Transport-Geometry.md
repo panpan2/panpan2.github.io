@@ -9,11 +9,11 @@ toc: true
 
 # Introduction
 
-### What
+## What
 
 This blog post is short article about my master thesis "Molecular graph learning in the Optimal Transport Geometry" done at ETH Zurich under the supervision of Prof. Thomas Hofmann (ETH), Dr. Octavian Ganea (MIT) and Dr. Gary Bécingeul (ETH) (10/10/2020). Parts of this work were collaborative with Octav Dragoi (TUM) who was working on "Optimizing Molecular Graphs in the Wasserstein Space". In this work, we are concerned with learning a latent space for molecular graphs and define a geometry to measure distances between molecules using Optimal Transport ([OT](<https://en.wikipedia.org/wiki/Transportation_theory_(mathematics)>)). This latent space can be later used for downstream tasks such as generating molecules, property prediction or molecule optimization.
 
-### Why
+## Why
 
 In traditional computer-aided drug design (_CADD_), molecules formed with hand-crafted bond rules are enumerated and evaluated against some property of interest (e.g. obtaining more potent drugs with fewer side effects). While this technique has the advantage that it leaves us with knowledge of how to synthesize a molecule, it’s an untargeted search over a small subspace of the gigantic chemical space that remains vastly unexplored.
 
