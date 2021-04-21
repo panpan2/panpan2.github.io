@@ -375,6 +375,20 @@ We believe that a way to improve the Tanimoto similarity could be to compute som
 
 And that's it! Thanks for reading this far! Too bad, the application of OT wasn't that successful after all :) Feel free to reach out if you're working on something similar or just want to talk about this.
 
+<br />
+
+Cited as:
+
+```
+@article{panayiotou2021molgraphlearn,
+  title   = "Molecular graph learning in the Optimal Transport Geometry",
+  author  = "Panayiotou, Panayiotis and Ganea, Octavian and Dragoi, Octav and Hofmann, Thomas",
+  journal = "https://panpan2.github.io/",
+  year    = "2021",
+  url     = "https://panpan2.github.io/2021/04/20/molecular-graph-learning-in-the-optimal-transport-geometry"
+}
+```
+
 # References
 
 <div id="1">[1] Tanimoto, T. T. IBM Internal Report; IBM Corporation: Armonk, NY, Nov 17, 1957.</div>
